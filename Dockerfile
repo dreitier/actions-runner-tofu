@@ -15,7 +15,7 @@ ARG TARGETARCH
 # Tool versions (Renovate: comment on the line above). Never newer than on the workstations that apply the
 # same units: OpenTofu refuses states written by a newer version.
 # renovate: datasource=github-releases depName=opentofu/opentofu extractVersion=^v(?<version>.*)$
-ARG TOFU_VERSION=1.11.5
+ARG TOFU_VERSION=1.13.9
 # renovate: datasource=github-releases depName=gruntwork-io/terragrunt extractVersion=^v(?<version>.*)$
 ARG TERRAGRUNT_VERSION=1.1.2
 # AWS CLI v1 from PyPI: v2 has no checksum file for its installer (only a PGP signature)
