@@ -1,0 +1,82 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "actions-runner-tofu: runner base image, OpenTofu/Terragrunt/AWS CLI versions (Dockerfile ARGs), GitHub Actions, pre-commit hooks, CI tools.",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":dependencyDashboard",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "Europe/Berlin",
+  "labels": [
+    "dependencies"
+  ],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 0,
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ],
+    "schedule": [
+      "at any time"
+    ]
+  },
+  "pre-commit": {
+    "enabled": true
+  },
+  "pip_requirements": {
+    "managerFilePatterns": [
+      "/(^|/)requirements-ci\\.txt$/"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Tool versions in the Dockerfile: # renovate: datasource=<ds> depName=<name> [extractVersion=<regex>] on the line above an ARG",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)(?:\\s+extractVersion=(?<extractVersion>\\S+))?\\s*\\nARG\\s+\\w+=(?<currentValue>\\S+)"
+      ],
+      "extractVersionTemplate": "{{#if extractVersion}}{{{extractVersion}}}{{else}}^(?<version>.*)${{/if}}"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Everything that ends up in the image → build(deps): semantic-release publishes a patch release",
+      "matchFileNames": [
+        "Dockerfile"
+      ],
+      "semanticCommitType": "build"
+    },
+    {
+      "description": "Pipeline and tooling → ci(deps): no release",
+      "matchManagers": [
+        "github-actions",
+        "pre-commit",
+        "pip_requirements"
+      ],
+      "semanticCommitType": "ci"
+    },
+    {
+      "description": "GitHub Actions and pre-commit hooks: one PR each",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "OpenTofu and Terragrunt must not get ahead of the workstations that apply the same units (newer OpenTofu writes states older versions refuse) – merge after upgrading them locally",
+      "matchDepNames": [
+        "opentofu/opentofu",
+        "gruntwork-io/terragrunt"
+      ],
+      "addLabels": [
+        "workstation-first"
+      ]
+    }
+  ]
+}

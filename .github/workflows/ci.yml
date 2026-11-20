@@ -1,0 +1,83 @@
+name: CI
+
+# Runs on pull requests, weekly (to catch new CVEs in the Ubuntu packages of the base image), manually,
+# and as the first stage of the release workflow.
+on:
+  pull_request:
+  schedule:
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # pre-commit version: .github/requirements-ci.txt (Renovate)
+      - name: Install pre-commit
+        run: pipx install "$(grep -E '^pre-commit==' .github/requirements-ci.txt)"
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # The hooks of .pre-commit-config.yaml exactly as locally; hadolint runs separately with a pinned version
+      - name: pre-commit
+        env:
+          SKIP: hadolint-docker
+        run: pre-commit run --all-files --show-diff-on-failure --color=always
+
+      - name: Lint Dockerfile
+        if: ${{ !cancelled() }}
+        uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387 # v3.5.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      # linux/amd64 only – the cluster's nodes (ARC) are amd64
+      - name: Build image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: actions-runner-tofu:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test
+        run: .github/ci/smoke-test.sh actions-runner-tofu:ci
+
+      # CRITICAL/HIGH with a fix, SARIF to the Security tab (category trivy). Reporting only: findings in the
+      # base image are fixed by the next runner release / rebuild
+      - name: Scan image with Trivy
+        uses: dreitier/shared-ci-components/trivy-scan@eec1480693feee5edb0272c24f63a398bee80108 # v1.0.0
+        with:
+          image: actions-runner-tofu:ci
