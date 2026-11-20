@@ -69,11 +69,21 @@
       "groupName": "GitHub Actions"
     },
     {
-      "description": "OpenTofu and Terragrunt must not get ahead of the workstations that apply the same units (newer OpenTofu writes states older versions refuse) – merge after upgrading them locally",
+      "description": "OpenTofu and Terragrunt: same minor as on the workstations (OpenTofu 1.12, Terragrunt 1.1) and basement's version constraints – raise allowedVersions together with the workstation upgrade",
       "matchDepNames": [
-        "opentofu/opentofu",
+        "opentofu/opentofu"
+      ],
+      "allowedVersions": "<1.13",
+      "addLabels": [
+        "workstation-first"
+      ]
+    },
+    {
+      "description": "Terragrunt: see OpenTofu",
+      "matchDepNames": [
         "gruntwork-io/terragrunt"
       ],
+      "allowedVersions": "<1.2",
       "addLabels": [
         "workstation-first"
       ]

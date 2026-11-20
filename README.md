@@ -25,8 +25,10 @@ It runs the deploy workflows of `dreitier/basement` in the cluster (see `docs/ci
 ## Versions
 
 Pinned as `ARG`s in the [Dockerfile](Dockerfile) and kept up to date by Renovate (each update is a patch
-release). OpenTofu and Terragrunt must never be newer than on the workstations that apply the same units
-(a newer OpenTofu writes states that older versions refuse) – their PRs carry the label `workstation-first`.
+release). OpenTofu and Terragrunt stay on the minor version of the workstations that apply the same units
+(currently OpenTofu 1.12, Terragrunt 1.1 – `allowedVersions` in [renovate.json](renovate.json), checked by the
+version constraints in basement): a newer OpenTofu may write states that older versions refuse. Upgrade the
+workstations first, then raise `allowedVersions`.
 
 The downloads of OpenTofu and Terragrunt are verified against the SHA256SUMS of their GitHub releases.
 
