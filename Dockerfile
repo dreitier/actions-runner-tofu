@@ -12,10 +12,11 @@ LABEL org.opencontainers.image.source="https://github.com/dreitier/actions-runne
 
 ARG TARGETARCH
 
-# Tool versions (Renovate: comment on the line above). Never newer than on the workstations that apply the
-# same units: OpenTofu refuses states written by a newer version.
+# Tool versions (Renovate: comment on the line above). Same minor as on the workstations that apply the same
+# units (renovate.json allowedVersions, basement's version constraints): a newer OpenTofu may write states
+# that older versions refuse.
 # renovate: datasource=github-releases depName=opentofu/opentofu extractVersion=^v(?<version>.*)$
-ARG TOFU_VERSION=1.11.5
+ARG TOFU_VERSION=1.12.3
 # renovate: datasource=github-releases depName=gruntwork-io/terragrunt extractVersion=^v(?<version>.*)$
 ARG TERRAGRUNT_VERSION=1.1.2
 # AWS CLI v1 from PyPI: v2 has no checksum file for its installer (only a PGP signature)
