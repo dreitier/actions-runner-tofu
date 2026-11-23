@@ -78,6 +78,6 @@ jobs:
       # CRITICAL/HIGH with a fix, SARIF to the Security tab (category trivy). Reporting only: findings in the
       # base image are fixed by the next runner release / rebuild
       - name: Scan image with Trivy
-        uses: dreitier/shared-ci-components/trivy-scan@1ba590342248df7855a136be3420378586d139d6 # v1.2.0
+        uses: dreitier/shared-ci-components/trivy-scan@486b3fed3ce26e365ef8de6a17cde2ad86b4e269 # v1.3.0
         with:
           image: actions-runner-tofu:ci
