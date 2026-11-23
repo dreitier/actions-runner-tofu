@@ -16,7 +16,7 @@ ARG TARGETARCH
 # units (renovate.json allowedVersions, basement's version constraints): a newer OpenTofu may write states
 # that older versions refuse.
 # renovate: datasource=github-releases depName=opentofu/opentofu extractVersion=^v(?<version>.*)$
-ARG TOFU_VERSION=1.12.3
+ARG TOFU_VERSION=1.12.12
 # renovate: datasource=github-releases depName=gruntwork-io/terragrunt extractVersion=^v(?<version>.*)$
 ARG TERRAGRUNT_VERSION=1.1.2
 # AWS CLI v1 from PyPI: v2 has no checksum file for its installer (only a PGP signature)
