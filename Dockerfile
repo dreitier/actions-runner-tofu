@@ -18,7 +18,7 @@ ARG TARGETARCH
 # renovate: datasource=github-releases depName=opentofu/opentofu extractVersion=^v(?<version>.*)$
 ARG TOFU_VERSION=1.12.3
 # renovate: datasource=github-releases depName=gruntwork-io/terragrunt extractVersion=^v(?<version>.*)$
-ARG TERRAGRUNT_VERSION=1.1.2
+ARG TERRAGRUNT_VERSION=1.1.6
 # AWS CLI v1 from PyPI: v2 has no checksum file for its installer (only a PGP signature)
 # renovate: datasource=pypi depName=awscli
 ARG AWSCLI_VERSION=1.46.3
